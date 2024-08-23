@@ -175,6 +175,16 @@ const sendShieldedQuery = async (provider, destination, data) => {
   return await decryptNodeResponse(rpclink, response, usedEncryptedKey);
 };
 
+const sendVerify = async (provider, destination, data) => {
+  const rpclink = hre.network.config.url;
+  const [encryptedData, usedEncryptedKey] = await encryptDataField(rpclink, data);
+  const response = await provider.call({
+    to: destination,
+    data: encryptedData,
+  });
+  return await decryptNodeResponse(rpclink, response, usedEncryptedKey);
+};
+
 async function main() {
   const contractAddress = fs.readFileSync("proxiedContract.txt", "utf8").trim();
   const [signer] = await hre.ethers.getSigners();
@@ -183,6 +193,10 @@ async function main() {
   const functionName = "getMessage";
   const responseMessage = await sendShieldedQuery(signer.provider, contractAddress, contract.interface.encodeFunctionData(functionName));
   console.log("Decoded response:", contract.interface.decodeFunctionResult(functionName, responseMessage)[0]);
+  await hre.run("verify:verify", {
+      address: contract.target, // address of deployed contract
+      constructorArguments: [JAN_1ST_2030], // constructor arguments
+  });
 }
 
 main().catch((error) => {
