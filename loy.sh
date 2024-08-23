@@ -194,7 +194,7 @@ async function main() {
   const responseMessage = await sendShieldedQuery(signer.provider, contractAddress, contract.interface.encodeFunctionData(functionName));
   console.log("Decoded response:", contract.interface.decodeFunctionResult(functionName, responseMessage)[0]);
   await hre.run("verify:verify", {
-      address: contract.target, // address of deployed contract
+      address: contractAddress, // address of deployed contract
       constructorArguments: [JAN_1ST_2030], // constructor arguments
   });
 }
